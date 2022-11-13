@@ -1,0 +1,162 @@
+﻿@model IEnumerable<SocialNetwork.Models.Data.UserDTO>
+
+@{
+    ViewBag.Title = "Friends";
+}
+
+<h2>Friends</h2>
+
+@if (!Model.Any())
+{
+    <h1 style="text-align: center;">You have no friends yet...</h1>
+}
+else
+{
+
+
+
+    <table class="table" id="friendsTable">
+        <thead>
+            <tr>
+                <th>
+                    Picture
+                </th>
+                <th>
+                    First Name
+                </th>
+                <th>
+                    Last Name
+                </th>
+                <th>
+                    Username
+                </th>
+
+                <th>
+                    Action
+                </th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        <a href="/Account/UserId/@item.Id"> <img src="~/Uploads/@(item.Id).jpg" class="friendpic" /></a>
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.FirstName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.LastName)
+                    </td>
+
+                    <td>
+                        @("@")@Html.DisplayFor(modelItem => item.Username)
+                    </td>
+
+                    <td>
+                        <a class="gotoprofile" href="/Account/UserId/@item.Id">
+
+
+                            <i class="fa-regular fa-eye"></i> See Profile
+                        </a> <br />
+                        <a class="removefriend" data-friend-id="@item.Id" data-friend-name="@item.FirstName" data-friend-lastname="@item.LastName" data-friend-username="@item.Username" href="#"> <i class="fa-solid fa-user-xmark"></i>  Remove</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+
+    </table>
+}
+
+<div class="arefriendsdiv alert alert-danger removefriendbutton">
+    <a class="removefriend" href="#"> <span class="glyphicon glyphicon-remove"></span> remove?</a>
+</div>
+
+<div>
+
+    <a class="iconlink" id="blabla" style="color: #1b2d87;" href="/Account/">
+        <i class="fa-solid fa-house"></i>
+        Home
+    </a> <br />
+
+</div>
+
+
+@section scripts{
+
+    <script>
+        $(document).ready(function () {
+            $("#friendsTable").DataTable();
+
+            $("a.removefriend").click(function (e) {
+                e.preventDefault();
+
+                var userId = $(this).data("friend-id");
+                var $name = $(this).data("friend-name") + " " + $(this).data("friend-lastname");
+                var $username = $(this).data("friend-username");
+
+
+                bootbox.confirm("Do you want to remove  " + $name + " (@("@")" + $username + " ) from your friends?", function (result) {
+                        if (result) {
+                            var friend = $username;
+
+                            var url = "/profile/RemoveFriend";
+
+                            $.post(url, {
+                                friend: friend,
+                            }, function (data) {
+
+                                //$(".arefriendsdiv").removeClass("alert-info").addClass("alert-warning")
+                                //  .html("<p>Pending friend request</p>")
+
+                            }).done(function () {
+                                console.log("success")
+
+                                window.location.reload();
+                                hub.server.getFcount(@ViewBag.UsernameId);
+                                //hub.server.notify(friend);
+                            });
+                        }
+                    });
+
+
+
+
+                });
+
+
+            //Search Friends
+            $("input#searchtext").keyup(function () {
+                var searchVal = $("input#searchtext").val();
+
+                $("ul#livesearchul").empty();
+
+                if (searchVal == "" || searchVal == " ") return false;
+
+                var url = "/Profile/LiveSearch";
+
+                $.post(url, {
+                    searchVal: searchVal,
+                }, function (data) {
+
+                    if ($("ul#livesearchul li.close").length) return;
+
+
+                    if (data.length > 0) {
+                        $("ul#livesearchul").append("<li class='close'>x</li>");
+                    }
+
+                    for (var i = 0; i < data.length; i++) {
+                        var obj = data[i];
+                        $("ul#livesearchul").append("<li class='livesearchli'><a href='/" + obj.Username + "'> <img src='/Uploads/" + obj.UserId + ".jpg' />" + " " + obj.FirstName + " " + obj.LastName + " </a></li>");
+                    }
+
+                });
+
+            });
+        })
+    </script>
+
+}
