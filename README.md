@@ -11,5 +11,5 @@ SocialNetwork is a web application built using ASP.NET MVC and SignalR. The appl
 **Author:**
 - Petar Stojanovic - [LinkedIn](https://www.linkedin.com/in/petar-stojanovic-404266236/)
 
-**Demo Video:**<br />
-Here is [demo video](https://www.youtube.com/watch?v=p5bEOGw_SdA) showcasing the features of the application.
+**Demo:**<br />
+Here is a [demo video](https://www.youtube.com/watch?v=p5bEOGw_SdA) showcasing the features of the application.
